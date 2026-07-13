@@ -21,7 +21,10 @@ export type PortfolioProject = {
   category: string;
   image: string;
   alt: string;
-  aspect: "wide" | "square";
+  /** Intrinsic pixel size — keeps frame matched to the artwork */
+  width: number;
+  height: number;
+  aspect?: "wide" | "square";
   badge?: string;
   offsetTop?: boolean;
   href?: string;

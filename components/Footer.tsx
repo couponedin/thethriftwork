@@ -29,11 +29,11 @@ export function Footer() {
   return (
     <footer
       ref={footerRef}
-      className="bg-surface-container-lowest w-full relative border-t border-white/[0.08] flex flex-col gap-section-gap px-margin-safe pt-section-gap pb-10"
+      className="bg-surface-container-lowest w-full relative border-t border-white/[0.08] flex flex-col gap-16 md:gap-24 lg:gap-section-gap px-margin-safe pt-16 md:pt-24 lg:pt-section-gap pb-10"
     >
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-14">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10 md:gap-14">
         <div
-          className="font-display-xl text-display-xl font-black tracking-tighter text-on-surface opacity-[0.07] leading-none"
+          className="font-display-xl text-[clamp(2.5rem,10vw,7.5rem)] font-black tracking-tighter text-on-surface opacity-[0.07] leading-none overflow-hidden max-w-full"
           aria-hidden="true"
         >
           {siteConfig.name}

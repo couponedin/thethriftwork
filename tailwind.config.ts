@@ -68,8 +68,8 @@ const config: Config = {
         "stack-sm": "8px",
         "stack-md": "18px",
         "section-gap": "168px",
-        "margin-safe": "5.5vw",
-        gutter: "28px",
+        "margin-safe": "clamp(1rem, 4.5vw, 5.5vw)",
+        gutter: "clamp(16px, 2.5vw, 28px)",
         "stack-lg": "36px",
       },
       fontFamily: {

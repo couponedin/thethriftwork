@@ -11,14 +11,14 @@ import type { Service } from "@/lib/types";
 
 registerGsapPlugins();
 
-const SLIDE_H = "h-[380px] md:h-[500px]";
+const SLIDE_H = "h-[320px] md:h-[380px] lg:h-[480px] xl:h-[500px]";
 
 function DetailSlide({ service }: { service: Service }) {
   return (
     <div
       className={`w-full ${SLIDE_H} shrink-0 rounded-[28px] md:rounded-[32px] bg-white text-black p-8 md:p-10 lg:p-11 flex flex-col justify-between`}
     >
-      <p className="font-sans text-[17px] md:text-[20px] lg:text-[21px] leading-relaxed tracking-[-0.02em] text-black/85">
+      <p className="font-sans text-[15px] md:text-[17px] lg:text-[20px] xl:text-[21px] leading-relaxed tracking-[-0.02em] text-black/85">
         {service.description}
       </p>
       <div className="mt-10 pt-2 flex items-center gap-3 text-[13px] md:text-[14px] tracking-[-0.01em] text-black/45">
@@ -151,18 +151,18 @@ export function Services() {
       <div className="rounded-[22px] sm:rounded-[28px] md:rounded-[40px] lg:rounded-[48px] bg-[#1c1c1c] px-5 md:px-8 lg:px-12 pt-10 md:pt-14 lg:pt-16 pb-20 md:pb-28 lg:pb-32">
       <div
         data-offer-fade
-        className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start mb-12 md:mb-16 lg:mb-20"
+        className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-6 lg:gap-8 items-start mb-10 md:mb-14 lg:mb-20"
       >
-        <p className="lg:col-span-3 text-[13px] md:text-sm font-medium tracking-[-0.01em] text-white/70">
+        <p className="md:col-span-3 text-[13px] md:text-sm font-medium tracking-[-0.01em] text-white/70">
           Services
         </p>
         <h2
           id="services-heading"
-          className="lg:col-span-5 font-sans text-[clamp(2.5rem,5vw,4.25rem)] leading-[1.05] font-semibold tracking-[-0.04em] text-white text-center lg:text-left"
+          className="md:col-span-5 font-sans text-[clamp(2.25rem,4.5vw,4.25rem)] leading-[1.05] font-semibold tracking-[-0.04em] text-white text-left"
         >
           What we offer.
         </h2>
-        <p className="lg:col-span-4 lg:text-right text-[13px] md:text-[15px] leading-relaxed text-white/55 max-w-sm lg:ml-auto">
+        <p className="md:col-span-4 md:text-right text-[13px] md:text-[15px] leading-relaxed text-white/55 max-w-sm md:ml-auto">
           We specialize in creating bold, high-impact digital experiences that
           set brands apart.
         </p>
@@ -170,10 +170,10 @@ export function Services() {
 
       <div
         data-offer-fade
-        className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.9fr_0.9fr] gap-5 md:gap-6 lg:gap-6 items-start"
+        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[1.15fr_0.925fr_0.925fr] gap-5 md:gap-5 lg:gap-6 items-start"
       >
         <ul
-          className="flex flex-col gap-2.5 list-none p-0 m-0"
+          className="flex flex-col gap-2 md:gap-2.5 list-none p-0 m-0 md:col-span-2 xl:col-span-1"
           role="tablist"
           aria-label="Services"
         >
@@ -188,20 +188,20 @@ export function Services() {
                   onMouseEnter={() => setActiveIndex(index)}
                   onFocus={() => setActiveIndex(index)}
                   onClick={() => setActiveIndex(index)}
-                  className={`w-full text-left flex items-center gap-3 md:gap-4 rounded-2xl px-4 md:px-5 py-4 md:py-4.5 transition-colors duration-300 ${
+                  className={`w-full text-left flex items-center gap-3 md:gap-4 rounded-2xl px-4 md:px-5 py-3.5 md:py-4 transition-colors duration-300 ${
                     activeItem
                       ? "bg-white text-black"
                       : "bg-transparent text-white/45 hover:text-white/75"
                   }`}
                 >
                   <span
-                    className={`tabular-nums text-[14px] md:text-[15px] shrink-0 ${
+                    className={`tabular-nums text-[13px] md:text-[15px] shrink-0 ${
                       activeItem ? "text-black/45" : "text-white/30"
                     }`}
                   >
                     {index + 1}.
                   </span>
-                  <span className="font-sans text-[16px] md:text-[18px] font-medium tracking-[-0.02em]">
+                  <span className="font-sans text-[15px] md:text-[17px] xl:text-[18px] font-medium tracking-[-0.02em]">
                     {service.title}
                   </span>
                 </button>
@@ -212,7 +212,7 @@ export function Services() {
 
         <div
           ref={leftViewportRef}
-          className={`overflow-hidden ${SLIDE_H} rounded-[28px] md:rounded-[32px]`}
+          className={`overflow-hidden ${SLIDE_H} rounded-[24px] md:rounded-[32px]`}
           role="tabpanel"
           aria-live="polite"
         >
@@ -225,7 +225,7 @@ export function Services() {
 
         <div
           ref={rightViewportRef}
-          className={`overflow-hidden ${SLIDE_H} rounded-[28px] md:rounded-[32px]`}
+          className={`overflow-hidden ${SLIDE_H} rounded-[24px] md:rounded-[32px]`}
           aria-hidden="true"
         >
           <div ref={rightTrackRef} className="flex flex-col will-change-transform">

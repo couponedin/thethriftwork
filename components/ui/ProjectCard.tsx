@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useRef, type MouseEvent } from "react";
-import { Parallax } from "@/components/motion/Parallax";
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol";
 import { useGsapContext } from "@/hooks/useGsapContext";
@@ -21,12 +20,10 @@ type ProjectCardProps = {
 export function ProjectCard({ project, className }: ProjectCardProps) {
   const cardRef = useRef<HTMLElement>(null);
   const { scrollTo } = useLenis();
-  const aspectClass =
-    project.aspect === "wide" ? "aspect-[16/10]" : "aspect-square";
-  const columnClass =
-    project.aspect === "wide"
-      ? "col-span-12 md:col-span-7"
-      : "col-span-12 md:col-span-5";
+  const isWide = project.aspect !== "square";
+  const columnClass = isWide
+    ? "col-span-12 lg:col-span-7"
+    : "col-span-12 lg:col-span-5";
   const href = project.href ?? "#contact";
   const isExternal = Boolean(project.href?.startsWith("http"));
 
@@ -50,7 +47,7 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
       className={cn(
         columnClass,
         "group will-change-transform",
-        project.offsetTop && "md:mt-16",
+        project.offsetTop && "lg:mt-16",
         className,
       )}
     >
@@ -67,26 +64,20 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
         className="block rounded-card focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
         aria-label={`${project.title} — ${project.category}`}
       >
-        <div
-          className={cn(
-            aspectClass,
-            "media-frame overflow-hidden rounded-card glass relative mb-7",
-          )}
-        >
-          <Parallax speed={12} scale={1.12}>
-            <Image
-              src={project.image}
-              alt={project.alt}
-              fill
-              sizes={
-                project.aspect === "wide"
-                  ? "(max-width: 768px) 100vw, 58vw"
-                  : "(max-width: 768px) 100vw, 42vw"
-              }
-              quality={85}
-              className="object-cover object-center transition-transform duration-[900ms] ease-[var(--ease-luxury)] group-hover:scale-[1.04]"
-            />
-          </Parallax>
+        <div className="relative mb-7 overflow-hidden rounded-card bg-[#141414]">
+          <Image
+            src={project.image}
+            alt={project.alt}
+            width={project.width}
+            height={project.height}
+            sizes={
+              isWide
+                ? "(max-width: 1024px) 100vw, 58vw"
+                : "(max-width: 1024px) 100vw, 42vw"
+            }
+            quality={92}
+            className="block h-auto w-full transition-transform duration-[900ms] ease-[var(--ease-luxury)] group-hover:scale-[1.015]"
+          />
           {project.badge ? (
             <div className="absolute top-6 left-6 z-10 bg-primary-container/95 text-on-primary-container px-4 py-1.5 font-label-mono uppercase text-[10px] tracking-[0.14em] rounded-full backdrop-blur-sm">
               {project.badge}

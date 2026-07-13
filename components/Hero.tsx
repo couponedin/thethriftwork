@@ -15,12 +15,15 @@ function HeroVideo({
   src,
   label,
   startOffset = 0,
+  playDelay = 0,
   className,
 }: {
   src: string;
   label: string;
-  /** Seconds into the video to start playback (keeps the two frames out of sync). */
+  /** Seconds into the video to jump after playback starts (Safari-safe). */
   startOffset?: number;
+  /** Delay before first play — keeps the two hero videos out of sync. */
+  playDelay?: number;
   className?: string;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -30,50 +33,101 @@ function HeroVideo({
     if (!video) return;
 
     let cancelled = false;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    let delayTimer: ReturnType<typeof setTimeout> | undefined;
 
-    const startPlayback = async () => {
+    // Safari needs these as DOM properties + attributes
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.setAttribute("playsinline", "true");
+    video.setAttribute("webkit-playsinline", "true");
+    video.setAttribute("muted", "true");
+
+    const applyOffset = () => {
+      if (cancelled || startOffset <= 0) return;
+      const duration = video.duration;
+      if (!Number.isFinite(duration) || duration <= 0) return;
+      const next = Math.min(startOffset, Math.max(duration - 0.2, 0));
       try {
-        // Wait until we can seek
-        if (video.readyState < 1) {
-          await new Promise<void>((resolve) => {
-            const onMeta = () => {
-              video.removeEventListener("loadedmetadata", onMeta);
-              resolve();
-            };
-            video.addEventListener("loadedmetadata", onMeta);
-          });
-        }
-        if (cancelled) return;
-
-        const duration = Number.isFinite(video.duration) ? video.duration : 0;
-        const offset =
-          duration > 0 ? Math.min(startOffset, Math.max(duration - 0.15, 0)) : 0;
-        video.currentTime = offset;
-        await video.play();
+        video.currentTime = next;
       } catch {
-        // Autoplay can fail on some browsers; ignore silently
+        // Safari can throw if not seekable yet
       }
     };
 
-    void startPlayback();
+    const tryPlay = async () => {
+      if (cancelled) return;
+      try {
+        video.muted = true;
+        const playPromise = video.play();
+        if (playPromise !== undefined) await playPromise;
+        if (cancelled) return;
+        // Seek AFTER play — seeking before play breaks Safari autoplay
+        if (startOffset > 0) {
+          if (video.readyState >= 1) applyOffset();
+          else video.addEventListener("loadedmetadata", applyOffset, { once: true });
+        }
+      } catch {
+        if (cancelled) return;
+        retryTimer = setTimeout(() => {
+          void tryPlay();
+        }, 600);
+      }
+    };
+
+    const onReady = () => {
+      if (!cancelled && video.paused) void tryPlay();
+    };
+
+    const onVisibility = () => {
+      if (document.visibilityState === "visible" && video.paused) {
+        void tryPlay();
+      }
+    };
+
+    video.addEventListener("canplay", onReady);
+    video.addEventListener("loadeddata", onReady);
+    document.addEventListener("visibilitychange", onVisibility);
+
+    delayTimer = setTimeout(() => {
+      void tryPlay();
+    }, Math.max(0, playDelay) * 1000);
+
+    try {
+      video.load();
+    } catch {
+      // ignore
+    }
 
     return () => {
       cancelled = true;
+      if (retryTimer) clearTimeout(retryTimer);
+      if (delayTimer) clearTimeout(delayTimer);
+      video.removeEventListener("canplay", onReady);
+      video.removeEventListener("loadeddata", onReady);
+      video.removeEventListener("loadedmetadata", applyOffset);
+      document.removeEventListener("visibilitychange", onVisibility);
       video.pause();
     };
-  }, [startOffset, src]);
+  }, [startOffset, playDelay, src]);
 
   return (
     <video
       ref={videoRef}
-      className={className ?? "absolute inset-0 h-full w-full object-cover"}
-      src={src}
+      className={
+        className ?? "absolute inset-0 h-full w-full object-cover bg-black"
+      }
       muted
       loop
       playsInline
+      autoPlay
       preload="auto"
+      disablePictureInPicture
       aria-label={label}
-    />
+    >
+      <source src={src} type="video/mp4" />
+    </video>
   );
 }
 
@@ -145,7 +199,7 @@ export function Hero() {
         y: 48,
         scale: 0.88,
         opacity: 0,
-        clipPath: "inset(42% 8% 42% 8% round 24px)",
+        clipPath: "inset(40% 6% 40% 6%)",
       });
       gsap.set(tags, { scale: 0.5, opacity: 0 });
       tags.forEach((tag) => {
@@ -182,11 +236,14 @@ export function Hero() {
             y: 0,
             scale: 1,
             opacity: 1,
-            clipPath: "inset(0% 0% 0% 0% round 24px)",
+            clipPath: "inset(0% 0% 0% 0%)",
             duration: 1.05,
             stagger: 0.22,
             ease: GSAP_EASE.luxury,
             force3D: true,
+            onComplete: () => {
+              gsap.set(media, { clearProps: "clipPath" });
+            },
           },
           "-=0.85",
         )
@@ -319,19 +376,19 @@ export function Hero() {
       >
       <div
         ref={cardRef}
-        className="relative rounded-[22px] sm:rounded-[28px] md:rounded-[40px] lg:rounded-[48px] bg-white text-black min-h-[calc(100svh-72px-5px)] md:min-h-[calc(100svh-80px-5px)] flex flex-col overflow-x-hidden overflow-y-visible will-change-transform [backface-visibility:hidden]"
+        className="relative rounded-[22px] sm:rounded-[28px] md:rounded-[36px] lg:rounded-[48px] bg-white text-black min-h-0 lg:min-h-[calc(100svh-80px-5px)] flex flex-col overflow-x-hidden overflow-y-visible will-change-transform [backface-visibility:hidden]"
       >
         <div
           ref={stageRef}
-          className="relative flex flex-1 flex-col justify-between px-4 pt-4 pb-3.5 sm:px-6 sm:pt-5 sm:pb-4 md:px-10 md:pt-7 md:pb-5 lg:px-12 lg:pt-8 lg:pb-6"
+          className="relative flex flex-1 flex-col justify-between px-4 pt-4 pb-3.5 sm:px-6 sm:pt-5 sm:pb-4 md:px-8 md:pt-6 md:pb-5 lg:px-12 lg:pt-8 lg:pb-6"
         >
           <div className="relative w-full">
             <h1 id="hero-heading" className="sr-only">
               Crafting Digital Experiences
             </h1>
 
-            {/* Row 1 */}
-            <div className="relative flex flex-col gap-2.5 md:flex-row md:items-end md:justify-between md:gap-0">
+            {/* Row 1 — stack until lg so tablet/MacBook mid widths don't overflow */}
+            <div className="relative flex flex-col gap-2.5 lg:flex-row lg:items-end lg:justify-between lg:gap-0">
               <div
                 ref={craftingRef}
                 className="relative z-10 shrink-0 will-change-transform"
@@ -342,7 +399,7 @@ export function Hero() {
                   rotate={heroContent.tags[0].rotate}
                   className="left-[8%] md:left-[14%] -top-1 md:-top-3"
                 />
-                <p className="font-display text-[clamp(3.1rem,15.5vw,12.5rem)] leading-[0.8] md:leading-[0.78] tracking-[0.01em] uppercase text-black md:whitespace-nowrap scale-y-[1.08] md:scale-y-[1.12] origin-bottom">
+                <p className="font-display text-[clamp(2.75rem,11vw,5.5rem)] md:text-[clamp(3.25rem,8.5vw,7rem)] lg:text-[clamp(4rem,9.5vw,12.5rem)] leading-[0.8] md:leading-[0.78] tracking-[0.01em] uppercase text-black lg:whitespace-nowrap scale-y-[1.08] md:scale-y-[1.1] lg:scale-y-[1.12] origin-bottom">
                   Cr
                   <span className="relative inline-block">
                     a
@@ -357,7 +414,7 @@ export function Hero() {
 
               <div
                 ref={mediaTopRef}
-                className="relative z-20 order-3 md:order-none w-[82%] max-w-[300px] md:w-auto md:flex-1 md:min-w-[180px] md:max-w-[560px] mx-auto md:mx-2 lg:mx-3 aspect-[2.2/1] md:self-end md:mb-1 will-change-transform"
+                className="relative z-20 order-3 lg:order-none w-[82%] max-w-[300px] md:max-w-[420px] lg:w-auto lg:flex-1 lg:min-w-[160px] lg:max-w-[560px] mx-auto lg:mx-2 xl:mx-3 aspect-[2.2/1] lg:self-end lg:mb-1 will-change-transform"
               >
                 <div
                   data-float
@@ -366,14 +423,15 @@ export function Hero() {
                   <HeroVideo
                     src={heroContent.media.top.src}
                     label={heroContent.media.top.alt}
-                    startOffset={0.4}
+                    startOffset={0.2}
+                    playDelay={0}
                   />
                 </div>
               </div>
 
               <div
                 ref={digitalRef}
-                className="relative z-10 order-2 md:order-none shrink-0 self-end md:self-auto text-right will-change-transform"
+                className="relative z-10 order-2 lg:order-none shrink-0 self-end lg:self-auto text-right will-change-transform"
               >
                 <HeroTag
                   label={heroContent.tags[1].label}
@@ -381,17 +439,17 @@ export function Hero() {
                   rotate={heroContent.tags[1].rotate}
                   className="right-[4%] md:right-[6%] -top-1 md:-top-3"
                 />
-                <p className="font-display text-[clamp(3.1rem,15.5vw,12.5rem)] leading-[0.8] md:leading-[0.78] tracking-[0.01em] uppercase text-black md:whitespace-nowrap scale-y-[1.08] md:scale-y-[1.12] origin-bottom">
+                <p className="font-display text-[clamp(2.75rem,11vw,5.5rem)] md:text-[clamp(3.25rem,8.5vw,7rem)] lg:text-[clamp(4rem,9.5vw,12.5rem)] leading-[0.8] md:leading-[0.78] tracking-[0.01em] uppercase text-black lg:whitespace-nowrap scale-y-[1.08] md:scale-y-[1.1] lg:scale-y-[1.12] origin-bottom">
                   Digital
                 </p>
               </div>
             </div>
 
-            {/* Row 2 */}
-            <div className="relative mt-1 md:mt-1.5 lg:mt-2 flex flex-col gap-2.5 md:flex-row md:items-center">
+            {/* Row 2 — stack until xl so video never covers Experiences on tablet/laptop */}
+            <div className="relative mt-1 md:mt-1.5 lg:mt-2 flex flex-col gap-2.5 xl:flex-row xl:items-center">
               <div
                 ref={mediaBottomRef}
-                className="relative z-20 order-2 md:order-none w-full max-w-[340px] md:w-[58%] lg:w-[54%] md:max-w-[720px] aspect-[2.2/1] shrink-0 self-center md:self-auto will-change-transform"
+                className="relative z-20 order-2 xl:order-none w-full max-w-[340px] md:max-w-[480px] xl:w-[48%] 2xl:w-[54%] xl:max-w-[720px] aspect-[2.2/1] shrink-0 self-center xl:self-auto will-change-transform"
               >
                 <div
                   data-float
@@ -400,12 +458,14 @@ export function Hero() {
                   <HeroVideo
                     src={heroContent.media.bottom.src}
                     label={heroContent.media.bottom.alt}
-                    startOffset={2.6}
+                    startOffset={4.2}
+                    playDelay={1.6}
+                    className="absolute inset-0 h-full w-full object-cover bg-black scale-[1.18] origin-center"
                   />
                 </div>
               </div>
 
-              <div className="relative z-10 order-1 md:order-none md:-ml-20 lg:-ml-36 flex-1 min-w-0 flex justify-start md:justify-end text-left md:text-right">
+              <div className="relative z-30 order-1 xl:order-none xl:-ml-10 2xl:-ml-28 flex-1 min-w-0 flex justify-start xl:justify-end text-left xl:text-right">
                 <div
                   ref={experiencesRef}
                   className="relative inline-block max-w-full will-change-transform"
@@ -416,7 +476,7 @@ export function Hero() {
                     rotate={heroContent.tags[2].rotate}
                     className="left-[6%] md:left-[8%] -top-1 md:-top-3"
                   />
-                  <p className="font-display text-[clamp(2.55rem,12.5vw,14rem)] md:text-[clamp(4.75rem,15.5vw,14rem)] leading-[0.8] md:leading-[0.74] tracking-[0.01em] uppercase text-[#D2D2D2] md:whitespace-nowrap scale-y-[1.08] md:scale-y-[1.14] origin-bottom">
+                  <p className="font-display text-[clamp(2.25rem,10vw,4.5rem)] md:text-[clamp(3rem,7.5vw,6.5rem)] lg:text-[clamp(3.75rem,8vw,8rem)] xl:text-[clamp(5rem,9.5vw,14rem)] leading-[0.8] xl:leading-[0.74] tracking-[0.01em] uppercase text-[#D2D2D2] xl:whitespace-nowrap scale-y-[1.08] xl:scale-y-[1.14] origin-bottom">
                     Experiences
                   </p>
                 </div>
@@ -426,10 +486,10 @@ export function Hero() {
 
           <div
             ref={footerRef}
-            className="relative z-30 mt-2.5 sm:mt-3 md:mt-4 lg:mt-5 shrink-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 sm:gap-4 lg:gap-6 items-end w-full border-t border-black/[0.06] pt-3.5 sm:pt-4 md:pt-4"
+            className="relative z-30 mt-3 sm:mt-4 md:mt-5 lg:mt-5 shrink-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 sm:gap-5 lg:gap-6 items-end w-full border-t border-black/[0.06] pt-3.5 sm:pt-4 md:pt-5"
           >
             <div className="lg:col-span-2">
-              <p className="font-display text-[36px] sm:text-[40px] md:text-[56px] leading-none font-normal tracking-[0.02em] text-black">
+              <p className="font-display text-[32px] sm:text-[36px] md:text-[44px] lg:text-[56px] leading-none font-normal tracking-[0.02em] text-black">
                 {heroContent.statsValue}
               </p>
               <p className="mt-1.5 text-[12px] md:text-[14px] leading-snug text-[#6B6B6B] whitespace-pre-line">
@@ -437,7 +497,7 @@ export function Hero() {
               </p>
             </div>
 
-            <p className="lg:col-span-3 text-[12px] md:text-[15px] leading-snug text-[#6B6B6B] whitespace-pre-line max-w-[210px]">
+            <p className="lg:col-span-3 text-[12px] md:text-[14px] lg:text-[15px] leading-snug text-[#6B6B6B] whitespace-pre-line max-w-[210px]">
               {siteConfig.tagline}
             </p>
 
@@ -451,7 +511,7 @@ export function Hero() {
               </MagneticButton>
             </div>
 
-            <p className="sm:col-span-2 lg:col-span-4 text-[12px] md:text-[15px] leading-relaxed text-[#6B6B6B] lg:text-right max-w-md lg:ml-auto">
+            <p className="sm:col-span-2 lg:col-span-4 text-[12px] md:text-[14px] lg:text-[15px] leading-relaxed text-[#6B6B6B] lg:text-right max-w-md lg:ml-auto">
               {heroContent.description}
             </p>
           </div>

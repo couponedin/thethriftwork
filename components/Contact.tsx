@@ -138,7 +138,7 @@ export function Contact() {
     <section
       ref={sectionRef}
       id="contact"
-      className="px-margin-safe py-section-gap"
+      className="px-margin-safe py-20 md:py-28 lg:py-section-gap"
       aria-labelledby="contact-heading"
     >
       <div className="grid grid-cols-12 gap-gutter lg:gap-16 items-start">
@@ -146,13 +146,13 @@ export function Contact() {
           <h2
             ref={headingRef}
             id="contact-heading"
-            className="font-display-xl text-display-xl uppercase mb-14 tracking-tight"
+            className="font-display-xl text-[clamp(3.5rem,12vw,7.5rem)] uppercase mb-10 md:mb-14 tracking-tight"
           >
             Let&apos;s
             <br />
             <span className="text-primary">Talk.</span>
           </h2>
-          <div ref={infoRef} className="space-y-14">
+          <div ref={infoRef} className="space-y-10 md:space-y-14">
             {contactInfo.map((item) => (
               <div key={item.label}>
                 <span className="font-label-mono text-label-mono uppercase text-muted-text block mb-3">
@@ -160,13 +160,13 @@ export function Contact() {
                 </span>
                 {item.href ? (
                   <a
-                    className="font-headline-lg text-headline-lg tracking-tight hover:text-primary transition-colors duration-500 ease-[var(--ease-luxury)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                    className="font-headline-lg text-[clamp(1.5rem,4vw,3rem)] tracking-tight hover:text-primary transition-colors duration-500 ease-[var(--ease-luxury)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary break-all sm:break-normal"
                     href={item.href}
                   >
                     {item.value}
                   </a>
                 ) : (
-                  <p className="font-headline-lg text-body-lg text-on-surface/95 tracking-tight">
+                  <p className="font-headline-lg text-[clamp(1.25rem,3vw,1.5rem)] text-on-surface/95 tracking-tight">
                     {item.value}
                   </p>
                 )}
@@ -178,7 +178,7 @@ export function Contact() {
         <div className="col-span-12 lg:col-span-6 mt-12 lg:mt-0">
           <form
             ref={formRef}
-            className="glass relative z-10 p-10 md:p-12 rounded-card space-y-9 will-change-transform"
+            className="glass relative z-10 p-6 sm:p-8 md:p-12 rounded-card space-y-7 md:space-y-9 will-change-transform"
             onSubmit={handleSubmit}
             aria-label="Project brief"
           >
@@ -192,7 +192,7 @@ export function Contact() {
               aria-hidden="true"
             />
 
-            <div className="grid grid-cols-2 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-8">
               <FormField
                 id="firstName"
                 name="firstName"

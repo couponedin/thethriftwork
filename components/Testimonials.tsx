@@ -49,7 +49,7 @@ export function Testimonials() {
     <section
       ref={sectionRef}
       id="about"
-      className="relative h-[819px] flex items-center justify-center overflow-hidden section-fade-edge"
+      className="relative min-h-[70vh] md:min-h-[75vh] lg:min-h-[819px] flex items-center justify-center overflow-hidden section-fade-edge py-24 md:py-32"
       aria-labelledby="testimonials-heading"
     >
       <div className="absolute inset-0 z-0">
@@ -76,15 +76,15 @@ export function Testimonials() {
         <h2
           ref={headingRef}
           id="testimonials-heading"
-          className="font-display-lg text-[6vw] leading-[1.08] uppercase mb-9 tracking-tight"
+          className="font-display-lg text-[clamp(2.25rem,6.5vw,5rem)] leading-[1.08] uppercase mb-7 md:mb-9 tracking-tight"
         >
           <span className="block">Trusted by</span>
-          <span className="block whitespace-nowrap">
+          <span className="block md:whitespace-nowrap">
             <span className="text-primary italic font-semibold">Businesses</span>{" "}
             Like You.
           </span>
         </h2>
-        <p className="font-body-lg text-body-lg mb-14 text-on-surface-variant/90 max-w-2xl mx-auto text-balance">
+        <p className="font-body-lg text-[16px] md:text-body-lg mb-10 md:mb-14 text-on-surface-variant/90 max-w-2xl mx-auto text-balance">
           Join the ranks of market leaders who have transformed their digital
           presence with The Thrift Work.
         </p>

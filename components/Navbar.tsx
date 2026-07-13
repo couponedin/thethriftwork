@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
@@ -312,10 +313,18 @@ export function Navbar() {
           <Link
             href="/"
             data-nav-item
-            className="font-display text-[28px] md:text-[32px] font-semibold tracking-[-0.02em] leading-none hover:opacity-80 transition-opacity duration-300 will-change-transform"
+            className="relative flex items-center shrink-0 h-7 md:h-8 lg:h-9 w-[148px] md:w-[180px] lg:w-[210px] hover:opacity-80 transition-opacity duration-300 will-change-transform"
             onClick={closeMenu}
+            aria-label={siteConfig.name}
           >
-            {siteConfig.name}
+            <Image
+              src="/images/logo.png"
+              alt={siteConfig.name}
+              fill
+              priority
+              sizes="(max-width: 768px) 148px, (max-width: 1024px) 180px, 210px"
+              className="object-contain object-left"
+            />
           </Link>
 
           <div className="flex items-center gap-3 md:gap-3.5">
