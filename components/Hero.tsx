@@ -6,7 +6,7 @@ import { MagneticButton } from "@/components/ui/MagneticButton";
 import { useGsapContext } from "@/hooks/useGsapContext";
 import { DURATION, GSAP_EASE, prefersReducedMotion } from "@/lib/animations";
 import { siteConfig } from "@/lib/data";
-import { gsap, registerGsapPlugins, ScrollTrigger } from "@/lib/gsap";
+import { gsap, registerGsapPlugins } from "@/lib/gsap";
 import { heroContent } from "@/lib/hero";
 
 registerGsapPlugins();
@@ -34,7 +34,6 @@ function HeroVideo({
 
     let cancelled = false;
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
-    let delayTimer: ReturnType<typeof setTimeout> | undefined;
 
     // Safari needs these as DOM properties + attributes
     video.muted = true;
@@ -90,7 +89,7 @@ function HeroVideo({
     video.addEventListener("loadeddata", onReady);
     document.addEventListener("visibilitychange", onVisibility);
 
-    delayTimer = setTimeout(() => {
+    const delayTimer = setTimeout(() => {
       void tryPlay();
     }, Math.max(0, playDelay) * 1000);
 
@@ -103,7 +102,7 @@ function HeroVideo({
     return () => {
       cancelled = true;
       if (retryTimer) clearTimeout(retryTimer);
-      if (delayTimer) clearTimeout(delayTimer);
+      clearTimeout(delayTimer);
       video.removeEventListener("canplay", onReady);
       video.removeEventListener("loadeddata", onReady);
       video.removeEventListener("loadedmetadata", applyOffset);

@@ -22,6 +22,16 @@ export const metadata: Metadata = {
   title: siteConfig.title,
   description: siteConfig.description,
   metadataBase: new URL(siteConfig.url),
+  icons: {
+    icon: [
+      {
+        url: "/images/favicon/thethriftwork_logo.jpg",
+        type: "image/jpeg",
+      },
+    ],
+    shortcut: "/images/favicon/thethriftwork_logo.jpg",
+    apple: "/images/favicon/thethriftwork_logo.jpg",
+  },
   openGraph: {
     title: siteConfig.title,
     description: siteConfig.description,
