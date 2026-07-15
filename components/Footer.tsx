@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
 import { useGsapContext } from "@/hooks/useGsapContext";
@@ -32,12 +33,19 @@ export function Footer() {
       className="bg-surface-container-lowest w-full relative border-t border-white/[0.08] flex flex-col gap-16 md:gap-24 lg:gap-section-gap px-margin-safe pt-16 md:pt-24 lg:pt-section-gap pb-10"
     >
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10 md:gap-14">
-        <div
-          className="font-display-xl text-[clamp(2.5rem,10vw,7.5rem)] font-black tracking-tighter text-on-surface opacity-[0.07] leading-none overflow-hidden max-w-full"
-          aria-hidden="true"
+        <Link
+          href="/"
+          className="relative block h-10 md:h-12 lg:h-14 w-[200px] md:w-[240px] lg:w-[280px] opacity-90 hover:opacity-100 transition-opacity duration-300"
+          aria-label={siteConfig.name}
         >
-          {siteConfig.name}
-        </div>
+          <Image
+            src="/images/logo.png"
+            alt={siteConfig.name}
+            fill
+            sizes="(max-width: 768px) 200px, (max-width: 1024px) 240px, 280px"
+            className="object-contain object-left"
+          />
+        </Link>
         <nav className="flex flex-wrap gap-x-stack-lg gap-y-4" aria-label="Social">
           {socialLinks.map((link) => {
             const external = link.href.startsWith("http");

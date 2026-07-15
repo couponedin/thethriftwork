@@ -14,16 +14,26 @@ export const siteConfig = {
   description:
     "The Thrift Work helps brands grow with branding, websites, digital marketing, social media, and AI solutions. All without the bloated agency tax.",
   tagline: "Driven by Branding,\nWebsites, Marketing & AI",
+  taglineShort: "We craft profitable branding and web products for startups.",
   url: "https://www.thethrift.work",
   email: "hello@thethrift.work",
   address: "Ahmedabad, Gujarat",
+  postalCode: "382481",
+  founded: "2018",
+  industry: "Software Development",
+  companySize: "51–200 employees",
+  linkedin: "https://www.linkedin.com/company/77180325/",
+  credentials: [
+    "Microsoft Advertising Certified Professional",
+    "IONOS Official Partner",
+  ],
 };
 
 export const navLinks: NavLink[] = [
-  { label: "Work", href: "#work", active: true },
-  { label: "Services", href: "#services" },
-  { label: "About", href: "#about" },
-  { label: "Contact", href: "#contact" },
+  { label: "Work", href: "/#work", active: true },
+  { label: "Services", href: "/services" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export const heroAvatars: Avatar[] = [
@@ -204,7 +214,7 @@ export const contactInfo: ContactInfo[] = [
 
 export const socialLinks: SocialLink[] = [
   { label: "Instagram", href: "https://www.instagram.com/thethrift.work/" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/company/thethrift.work/" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/77180325/" },
   { label: "Twitter", href: "#" },
   { label: "Vimeo", href: "#" },
 ];

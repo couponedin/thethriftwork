@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
 import { MagneticButton } from "@/components/ui/MagneticButton";
@@ -20,16 +21,41 @@ export function Navbar() {
   const linksRef = useRef<HTMLElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const { scrollTo, lenis } = useLenis();
+  const router = useRouter();
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   const goTo = useCallback(
     (href: string) => {
       setMenuOpen(false);
-      // slight delay so panel can start closing before scroll
-      requestAnimationFrame(() => scrollTo(href, { offset: -20 }));
+
+      requestAnimationFrame(() => {
+        // Page routes: /services, /about
+        if (href.startsWith("/") && !href.startsWith("/#")) {
+          router.push(href);
+          return;
+        }
+
+        // Cross-page hash: /#work, /#contact
+        if (href.startsWith("/#")) {
+          if (window.location.pathname !== "/") {
+            router.push(href);
+            return;
+          }
+          scrollTo(href.slice(1), { offset: -20 });
+          return;
+        }
+
+        // Same-page hash: #contact
+        if (href.startsWith("#")) {
+          scrollTo(href, { offset: -20 });
+          return;
+        }
+
+        router.push(href);
+      });
     },
-    [scrollTo],
+    [scrollTo, router],
   );
 
   useEffect(() => {
